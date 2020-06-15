@@ -141,15 +141,13 @@ def mars_hemispheres(browser):
         mars_img_ending = soup.select_one('img.wide-image').get('src')
         
         #Attach the src to the base url for the full sized image
-        img_url = f'https://astrogeology.usgs.gov{mars_img_ending}'
-        
-        print(title)
-        print(img_url)
+        hemi_img_url = f'https://astrogeology.usgs.gov{mars_img_ending}'
         
         #Create a dictionary for each hemisphere that has img_url and title
-        hemi_image = {"image": img_url, "title": title}
+        hemi_image = {"image": hemi_img_url, "title": title}
         
-        print(hemi_image)
+        return hemi_image
+        
 
 browser.quit()
 
