@@ -19,7 +19,7 @@ def scrape_all():
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
         "last_modified": dt.datetime.now(),
-        "mars_hemi": mars_hemi(browser)
+        "mars_hemispheres": mars_hemispheres(browser)
     }
 
     browser.quit()
@@ -110,8 +110,46 @@ def mars_facts():
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html()
 
-def mars_hemi(browser):
+def mars_hemispheres(browser):
+
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+
+    html = browser.html
+    soup = BeautifulSoup(html, 'html.parser')
+
+    hemispheres = soup.find_all('div', class_='description')
+
+    #Iterate through the various hemispheres
+    for hemisphere in hemispheres:
     
+        #Sort through the html code to pull the title and href
+        link = hemisphere.find('a')
+        href = link['href']
+        h3 = link.find('h3')
+        hemi_string = h3.text
+        title = hemi_string.replace(' Enhanced', '')
+        
+        #Create the url for each hemi and visit the link
+        hemi_url = f'https://astrogeology.usgs.gov{href}'
+        browser.visit(hemi_url)
+        
+        html = browser.html
+        soup = BeautifulSoup(html, 'html.parser')
+        
+        #Use select one to pick the first full sized image and get the src
+        mars_img_ending = soup.select_one('img.wide-image').get('src')
+        
+        #Attach the src to the base url for the full sized image
+        img_url = f'https://astrogeology.usgs.gov{mars_img_ending}'
+        
+        print(title)
+        print(img_url)
+        
+        #Create a dictionary for each hemisphere that has img_url and title
+        hemi_image = {"image": img_url, "title": title}
+        
+        print(hemi_image)
 
 browser.quit()
 
